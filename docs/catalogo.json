@@ -1,0 +1,445 @@
+{
+  "Regiones": [
+    "nombre NVARCHAR(80) NOT NULL UNIQUE",
+    "",
+    [
+      [
+        "Central"
+      ],
+      [
+        "Occidente"
+      ]
+    ]
+  ],
+  "Municipios": [
+    "region_id INT NOT NULL REFERENCES Regiones(id), nombre NVARCHAR(80) NOT NULL",
+    "UNIQUE(region_id,nombre)",
+    [
+      [
+        1,
+        "Guatemala"
+      ],
+      [
+        2,
+        "Quetzaltenango"
+      ]
+    ]
+  ],
+  "Sucursales": [
+    "municipio_id INT NOT NULL REFERENCES Municipios(id), nombre NVARCHAR(100) NOT NULL UNIQUE, direccion NVARCHAR(200) NOT NULL",
+    "",
+    [
+      [
+        1,
+        "Central",
+        "Zona 1"
+      ],
+      [
+        2,
+        "Occidente",
+        "Zona 3"
+      ]
+    ]
+  ],
+  "Almacenes": [
+    "sucursal_id INT NOT NULL REFERENCES Sucursales(id), nombre NVARCHAR(80) NOT NULL",
+    "UNIQUE(sucursal_id,nombre)",
+    [
+      [
+        1,
+        "Principal"
+      ],
+      [
+        2,
+        "Principal"
+      ]
+    ]
+  ],
+  "Roles": [
+    "nombre NVARCHAR(80) NOT NULL UNIQUE",
+    "",
+    [
+      [
+        "Administrador"
+      ],
+      [
+        "Vendedor"
+      ],
+      [
+        "Bodeguero"
+      ]
+    ]
+  ],
+  "Empleados": [
+    "sucursal_id INT NOT NULL REFERENCES Sucursales(id), nombre NVARCHAR(100) NOT NULL, email NVARCHAR(160) NOT NULL UNIQUE, activo BIT NOT NULL DEFAULT 1",
+    "",
+    [
+      [
+        1,
+        "Ana Lopez",
+        "ana@example.test",
+        1
+      ],
+      [
+        2,
+        "Luis Perez",
+        "luis@example.test",
+        1
+      ]
+    ]
+  ],
+  "PerfilesEmpleado": [
+    "empleado_id INT NOT NULL UNIQUE REFERENCES Empleados(id), telefono NVARCHAR(20) NOT NULL, fecha_ingreso DATE NOT NULL",
+    "",
+    [
+      [
+        1,
+        "5555-0101",
+        "2025-01-01"
+      ],
+      [
+        2,
+        "5555-0102",
+        "2025-02-01"
+      ]
+    ]
+  ],
+  "EmpleadoRoles": [
+    "empleado_id INT NOT NULL REFERENCES Empleados(id), rol_id INT NOT NULL REFERENCES Roles(id)",
+    "UNIQUE(empleado_id,rol_id)",
+    [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ]
+    ]
+  ],
+  "Clientes": [
+    "nombre NVARCHAR(100) NOT NULL, nit NVARCHAR(20) NOT NULL UNIQUE, email NVARCHAR(160) NOT NULL",
+    "",
+    [
+      [
+        "Cliente Demo",
+        "CF-001",
+        "cliente@example.test"
+      ],
+      [
+        "Comercial Sol",
+        "123456-7",
+        "sol@example.test"
+      ]
+    ]
+  ],
+  "DireccionesCliente": [
+    "cliente_id INT NOT NULL REFERENCES Clientes(id), municipio_id INT NOT NULL REFERENCES Municipios(id), direccion NVARCHAR(200) NOT NULL",
+    "",
+    [
+      [
+        1,
+        1,
+        "Zona 5"
+      ],
+      [
+        2,
+        2,
+        "Zona 2"
+      ]
+    ]
+  ],
+  "Proveedores": [
+    "nombre NVARCHAR(100) NOT NULL, nit NVARCHAR(20) NOT NULL UNIQUE, email NVARCHAR(160) NOT NULL",
+    "",
+    [
+      [
+        "Distribuidora Norte",
+        "PROV-01",
+        "norte@example.test"
+      ],
+      [
+        "Tecnologia Sur",
+        "PROV-02",
+        "sur@example.test"
+      ]
+    ]
+  ],
+  "Categorias": [
+    "nombre NVARCHAR(80) NOT NULL UNIQUE",
+    "",
+    [
+      [
+        "Computacion"
+      ],
+      [
+        "Accesorios"
+      ],
+      [
+        "Oficina"
+      ]
+    ]
+  ],
+  "Marcas": [
+    "nombre NVARCHAR(80) NOT NULL UNIQUE",
+    "",
+    [
+      [
+        "Marca Uno"
+      ],
+      [
+        "Marca Dos"
+      ]
+    ]
+  ],
+  "Unidades": [
+    "nombre NVARCHAR(40) NOT NULL UNIQUE",
+    "",
+    [
+      [
+        "Unidad"
+      ],
+      [
+        "Caja"
+      ]
+    ]
+  ],
+  "Productos": [
+    "categoria_id INT NOT NULL REFERENCES Categorias(id), marca_id INT NOT NULL REFERENCES Marcas(id), unidad_id INT NOT NULL REFERENCES Unidades(id), sku NVARCHAR(40) NOT NULL UNIQUE, nombre NVARCHAR(100) NOT NULL, precio DECIMAL(12,2) NOT NULL CHECK(precio>0), activo BIT NOT NULL DEFAULT 1",
+    "",
+    [
+      [
+        1,
+        1,
+        1,
+        "LAP-01",
+        "Laptop",
+        4500,
+        1
+      ],
+      [
+        2,
+        2,
+        1,
+        "MOU-01",
+        "Mouse",
+        90,
+        1
+      ],
+      [
+        3,
+        1,
+        2,
+        "PAP-01",
+        "Papel",
+        40,
+        1
+      ],
+      [
+        2,
+        1,
+        1,
+        "TEC-01",
+        "Teclado",
+        150,
+        1
+      ],
+      [
+        1,
+        2,
+        1,
+        "MON-01",
+        "Monitor",
+        1200,
+        1
+      ]
+    ]
+  ],
+  "ProductoProveedores": [
+    "producto_id INT NOT NULL REFERENCES Productos(id), proveedor_id INT NOT NULL REFERENCES Proveedores(id), costo DECIMAL(12,2) NOT NULL CHECK(costo>0)",
+    "UNIQUE(producto_id,proveedor_id)",
+    [
+      [
+        1,
+        1,
+        3000
+      ],
+      [
+        2,
+        2,
+        40
+      ],
+      [
+        3,
+        1,
+        20
+      ],
+      [
+        4,
+        2,
+        80
+      ],
+      [
+        5,
+        1,
+        800
+      ]
+    ]
+  ],
+  "Existencias": [
+    "almacen_id INT NOT NULL REFERENCES Almacenes(id), producto_id INT NOT NULL REFERENCES Productos(id), cantidad INT NOT NULL DEFAULT 0 CHECK(cantidad>=0), minimo INT NOT NULL DEFAULT 5 CHECK(minimo>=0)",
+    "UNIQUE(almacen_id,producto_id)",
+    [
+      [
+        1,
+        1,
+        50,
+        5
+      ],
+      [
+        1,
+        2,
+        50,
+        5
+      ],
+      [
+        1,
+        3,
+        50,
+        5
+      ],
+      [
+        1,
+        4,
+        50,
+        5
+      ],
+      [
+        1,
+        5,
+        50,
+        5
+      ],
+      [
+        2,
+        1,
+        10,
+        5
+      ],
+      [
+        2,
+        2,
+        10,
+        5
+      ],
+      [
+        2,
+        3,
+        10,
+        5
+      ],
+      [
+        2,
+        4,
+        10,
+        5
+      ],
+      [
+        2,
+        5,
+        10,
+        5
+      ]
+    ]
+  ],
+  "Compras": [
+    "proveedor_id INT NOT NULL REFERENCES Proveedores(id), almacen_id INT NOT NULL REFERENCES Almacenes(id), empleado_id INT NOT NULL REFERENCES Empleados(id), fecha DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(), estado NVARCHAR(12) NOT NULL DEFAULT 'PENDIENTE' CHECK(estado IN ('PENDIENTE','RECIBIDA'))",
+    "",
+    [
+      [
+        1,
+        1,
+        1,
+        "2026-10-01",
+        "PENDIENTE"
+      ],
+      [
+        2,
+        2,
+        2,
+        "2026-10-02",
+        "PENDIENTE"
+      ]
+    ]
+  ],
+  "DetalleCompra": [
+    "compra_id INT NOT NULL REFERENCES Compras(id), producto_id INT NOT NULL REFERENCES Productos(id), cantidad INT NOT NULL CHECK(cantidad>0), costo DECIMAL(12,2) NOT NULL CHECK(costo>0)",
+    "UNIQUE(compra_id,producto_id)",
+    [
+      [
+        1,
+        1,
+        5,
+        3000
+      ],
+      [
+        1,
+        3,
+        20,
+        20
+      ],
+      [
+        2,
+        2,
+        15,
+        40
+      ],
+      [
+        2,
+        4,
+        10,
+        80
+      ]
+    ]
+  ],
+  "Ventas": [
+    "cliente_id INT NOT NULL REFERENCES Clientes(id), almacen_id INT NOT NULL REFERENCES Almacenes(id), empleado_id INT NOT NULL REFERENCES Empleados(id), fecha DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(), referencia UNIQUEIDENTIFIER NOT NULL UNIQUE",
+    "",
+    []
+  ],
+  "DetalleVenta": [
+    "venta_id INT NOT NULL REFERENCES Ventas(id), producto_id INT NOT NULL REFERENCES Productos(id), cantidad INT NOT NULL CHECK(cantidad>0), precio_unitario DECIMAL(12,2) NOT NULL CHECK(precio_unitario>0)",
+    "UNIQUE(venta_id,producto_id)",
+    []
+  ],
+  "MetodosPago": [
+    "nombre NVARCHAR(60) NOT NULL UNIQUE",
+    "",
+    [
+      [
+        "Efectivo"
+      ],
+      [
+        "Tarjeta"
+      ],
+      [
+        "Transferencia"
+      ]
+    ]
+  ],
+  "Pagos": [
+    "venta_id INT NOT NULL REFERENCES Ventas(id), metodo_pago_id INT NOT NULL REFERENCES MetodosPago(id), monto DECIMAL(14,2) NOT NULL CHECK(monto>0), fecha DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()",
+    "",
+    []
+  ],
+  "MovimientosInventario": [
+    "almacen_id INT NOT NULL REFERENCES Almacenes(id), producto_id INT NOT NULL REFERENCES Productos(id), venta_id INT NULL REFERENCES Ventas(id), compra_id INT NULL REFERENCES Compras(id), cantidad INT NOT NULL CHECK(cantidad<>0), fecha DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()",
+    "CHECK((venta_id IS NOT NULL AND compra_id IS NULL AND cantidad<0) OR (venta_id IS NULL AND compra_id IS NOT NULL AND cantidad>0))",
+    []
+  ]
+}
