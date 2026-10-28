@@ -21,6 +21,7 @@ styles=getSampleStyleSheet()
 styles.add(ParagraphStyle(name='Subtitle',fontName='Helvetica-Bold',fontSize=11,leading=16,textColor=TEAL))
 styles.add(ParagraphStyle(name='BodyCustom',fontName='Helvetica',fontSize=10,leading=15,spaceAfter=8,textColor=colors.HexColor('#253444')))
 styles.add(ParagraphStyle(name='SmallCustom',fontName='Helvetica',fontSize=8,leading=11,spaceAfter=5))
+styles.add(ParagraphStyle(name='TableHeader',parent=styles['SmallCustom'],textColor=colors.white))
 styles['Title'].textColor=BLUE
 styles['Heading1'].textColor=BLUE
 styles['Heading1'].spaceBefore=16
@@ -28,6 +29,8 @@ styles['Heading1'].spaceAfter=10
 styles['Heading2'].textColor=TEAL
 styles['Heading2'].spaceBefore=12
 styles['Heading2'].spaceAfter=8
+styles['Heading1'].keepWithNext=True
+styles['Heading2'].keepWithNext=True
 
 def para(text,style='BodyCustom'):
     value=escape(text)
@@ -62,19 +65,17 @@ def main():
             while index<len(lines) and lines[index].startswith('|'):
                 row=lines[index]
                 if not re.match(r'^\|[-| ]+\|$',row):
-                    data.append([para(x.strip(),'SmallCustom') for x in row.strip('|').split('|')])
+                    data.append([para(x.strip(),'TableHeader' if not data else 'SmallCustom') for x in row.strip('|').split('|')])
                 index+=1
             table=Table(data,colWidths=[4.3*cm,13.1*cm],repeatRows=1,hAlign='LEFT')
             table.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),BLUE),('TEXTCOLOR',(0,0),(-1,0),colors.white),('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.HexColor('#f0f5f8'),colors.white]),('VALIGN',(0,0),(-1,-1),'TOP'),('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),('TOPPADDING',(0,0),(-1,-1),6),('BOTTOMPADDING',(0,0),(-1,-1),6)]))
-            # Paragraphs own their text color, so explicitly make the header white.
-            for cell in data[0]: cell.style=ParagraphStyle(name='TH',parent=styles['SmallCustom'],textColor=colors.white)
             story.extend([table,Spacer(1,10)])
             continue
         if line.startswith('### '): story.append(para(line[4:],'Heading2'))
         elif line.startswith('## '): story.append(para(line[3:],'Heading1'))
         else:
             paragraph=line
-            while index+1<len(lines) and lines[index+1].strip() and not lines[index+1].startswith(('#','|','- ')):
+            while index+1<len(lines) and lines[index+1].strip() and not lines[index+1].startswith(('#','|','- ')) and not re.match(r'^\d+\.',lines[index+1]):
                 index+=1; paragraph+=' '+lines[index]
             story.append(para(paragraph))
         index+=1
