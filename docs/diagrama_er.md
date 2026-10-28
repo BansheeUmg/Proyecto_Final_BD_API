@@ -1,5 +1,12 @@
 # Diagrama entidad-relacion
 
+![Modelo ER completo](diagrama_er.svg)
+
+[Descargar PNG](diagrama_er.png) | [Fuente Mermaid](diagrama_er.mmd)
+
+<details>
+<summary>Codigo Mermaid editable</summary>
+
 ```mermaid
 erDiagram
     Regiones {
@@ -180,3 +187,5 @@ erDiagram
     Ventas |o--o{ MovimientosInventario : venta_id
     Compras |o--o{ MovimientosInventario : compra_id
 ```
+
+</details>

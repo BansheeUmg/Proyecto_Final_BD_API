@@ -2,6 +2,7 @@
 import json
 import re
 import sys
+from io import BytesIO
 from pathlib import Path
 from xml.sax.saxutils import escape
 from reportlab.lib import colors
@@ -10,6 +11,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
+from reportlab.pdfgen import canvas as pdfcanvas
+from pypdf import PdfReader, PdfWriter
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
@@ -52,7 +55,7 @@ def main():
     source=(ROOT/'docs/analisis.md').read_text(encoding='utf-8')
     # Markdown companion is intentionally kept alongside the canonical Mermaid source.
     er=(ROOT/'docs/diagrama_er.mmd').read_text(encoding='utf-8')
-    (ROOT/'docs/diagrama_er.md').write_text('# Diagrama entidad-relacion\n\n```mermaid\n'+er+'```\n',encoding='utf-8')
+    (ROOT/'docs/diagrama_er.md').write_text('# Diagrama entidad-relacion\n\n![Modelo ER completo](diagrama_er.svg)\n\n[Descargar PNG](diagrama_er.png) | [Fuente Mermaid](diagrama_er.mmd)\n\n<details>\n<summary>Codigo Mermaid editable</summary>\n\n```mermaid\n'+er+'```\n\n</details>\n',encoding='utf-8')
     story=[Spacer(1,2.2*cm),para('PROYECTO FINAL','Subtitle'),Spacer(1,.5*cm),para('Inventario y ventas multisucursal','Title'),Spacer(1,.7*cm),para('Diseno de base de datos relacional y API REST','Heading2'),Spacer(1,.7*cm),para('SQL Server + FastAPI | 24 tablas relacionadas | 3FN'),para('27 de octubre de 2026'),Spacer(1,1*cm),para('Repositorio de entrega','Heading2'),para('https://github.com/BansheeUmg/Proyecto_Final_BD_API'),Spacer(1,1*cm),para('Documento de analisis, reglas, modelo, dependencias funcionales, arquitectura y validacion. El codigo, los scripts y el diagrama ER completo se incluyen en el repositorio.'),PageBreak()]
     lines=source.splitlines()
     index=0
@@ -98,6 +101,23 @@ def main():
     output=ROOT/'docs/Proyecto_Final.pdf'
     doc=SimpleDocTemplate(str(output),pagesize=A4,rightMargin=1.8*cm,leftMargin=1.8*cm,topMargin=1.7*cm,bottomMargin=2*cm,title='Inventario y ventas - Proyecto Final BD',author='Proyecto Final BD',pageCompression=1)
     doc.build(story,onFirstPage=footer,onLaterPages=footer)
+    # Lamina amplia para que las 24 entidades y sus atributos puedan ampliarse al leer.
+    graph=ROOT/'docs/diagrama_er.png'
+    if graph.exists():
+        buffer=BytesIO()
+        c=pdfcanvas.Canvas(buffer,pagesize=(1500,1230))
+        c.setFont('Helvetica-Bold',24)
+        c.setFillColor(BLUE)
+        c.drawString(40,1180,'Anexo D. Diagrama entidad-relacion completo')
+        c.setFont('Helvetica',13)
+        c.drawString(40,1150,'24 entidades | PK y FK | relaciones 1:0..1 y 1:N | asociaciones N:M resueltas')
+        c.drawImage(str(graph),40,40,width=1420,height=1090,preserveAspectRatio=True,anchor='c')
+        c.showPage();c.save();buffer.seek(0)
+        writer=PdfWriter()
+        writer.append(PdfReader(str(output)))
+        writer.append(PdfReader(buffer))
+        writer.add_metadata({'/Title':'Inventario y ventas - Proyecto Final BD'})
+        with output.open('wb') as stream: writer.write(stream)
     print(output)
 
 if __name__=='__main__': main()

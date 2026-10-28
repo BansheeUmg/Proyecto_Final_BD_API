@@ -103,7 +103,9 @@ scripts/              generacion del PDF
 build_project.py      catalogo fuente que regenera SQL y Mermaid
 ```
 
-`docs/analisis.md` explica el dominio, alcance, reglas, DFs y normalizacion. `docs/diagrama_er.mmd` contiene todos los atributos y cardinalidades Mermaid; `docs/diagrama_er.md` permite verlo directamente en GitHub. `docs/Proyecto_Final.pdf` es el documento de entrega.
+`docs/analisis.md` explica el dominio, alcance, reglas, DFs y normalizacion. `docs/diagrama_er.mmd` contiene todos los atributos y cardinalidades Mermaid; `docs/diagrama_er.md` muestra su exportacion SVG en GitHub y conserva el codigo editable. Se incluye tambien PNG. `docs/Proyecto_Final.pdf` es el documento de entrega e incluye el ER completo como lamina ampliable.
+
+Para regenerar el PDF: instalar `requirements-docs.txt` y ejecutar `python scripts/generate_pdf.py`. Para modificar el ER, regenerar la fuente con `python build_project.py` y exportarla a SVG/PNG con Mermaid antes de reconstruir el PDF. La fuente fue validada y renderizada con Mermaid 12.2.0.
 
 Los procedimientos validan las operaciones de negocio. El CRUD no permite editar existencias, ventas ni movimientos directamente. La cuenta de la aplicacion debe limitarse a los permisos necesarios; el usuario de Windows utilizado en esta demostracion tiene privilegios de desarrollo. Los roles modelados representan puestos del negocio, no un sistema de inicio de sesion.
 
